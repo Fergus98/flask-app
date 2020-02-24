@@ -4,12 +4,8 @@
 {% block body_content %}
     <a href="{{ url_for('about') }}">About Page</a>
 
-    {% for post in posts %}
+   
         <div>
-            <h3>{{ post.title }}</h3>
-            <p><b> - First name:</b>{{ post.name.first }}</p>
-            <p><b> - Last name:</b>{{ post.name.last }}</p>
-            <p> -- {{ post.content }}</p>
+            <h3>{{ posts.title }}</h3>
         </div>
-    {% endfor %}
 {% endblock %}
