@@ -6,19 +6,14 @@ from application import app, db
 from application.models import Posts
 from application.forms import PostForm
  # define routes for / & /home, this function will be called when these are accessed
-blogData = [
-    {  
-        "name": {"first":"John", "last":"Doe"},
-        "title":"First Post",
-        "content":"This is some blog data for Flask lectures"
-    },
-    {   
-        "name": {"first":"Jane", "last":"Doe"},
-        "title":"Second Post",
-        "content":"This is even more blog data for Flask lectures"
-    }
-]
-@app.route('/posts')
+
+@app.route('/')
+@app.route('/home')
+def home():
+    blogData = Posts.query.first()
+    return render_template('home.html', title='Home', posts = blogData)
+
+@app.route('/posts', methods=['GET', 'POST'])
 def post():
     form = PostForm()
     if form.validate_on_submit():
@@ -38,12 +33,6 @@ def post():
         print(form.errors)
 
     return render_template('posts.html', title='Post', form=form)
-
-@app.route('/')
-@app.route('/home')
-def home():
-    blogData = Posts.query.first()
-    return render_template('home.html', title='Home', posts = blogData)
 
 @app.route('/about')
 def about():
