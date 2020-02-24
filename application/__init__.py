@@ -10,7 +10,3 @@ db = SQLAlchemy(app)
  # import the ./application/routes.py fi
 from application import routes
 
-#user - ferg
-#password - password
-#host - 127.0.0.1
-#db name - flaskapp 
