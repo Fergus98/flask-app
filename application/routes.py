@@ -1,10 +1,10 @@
  # import render_template function from the flask module
 from flask import render_template, redirect, url_for
  # import the app object from the ./application/__init__.py
-from application import app, db
+from application import app, db, bcrypt
 
-from application.models import Posts
-from application.forms import PostForm
+from application.models import Posts, Users
+from application.forms import PostForm, RegistrationForm
  # define routes for / & /home, this function will be called when these are accessed
 
 @app.route('/')
@@ -33,6 +33,19 @@ def post():
         print(form.errors)
 
     return render_template('posts.html', title='Post', form=form)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data.decode('utf-8'))
+
+        user = Users(email=form.email.data, password=hash_pw)
+
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('post'))
+    return render_template('register.html', title='Register', form=form)
 
 @app.route('/about')
 def about():
