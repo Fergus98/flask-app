@@ -6,13 +6,13 @@ from application import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 
 from application.models import Posts, Users
-from application.forms import PostForm, RegistrationForm,LoginForm
+from application.forms import PostForm, RegistrationForm,LoginForm, UpdateAccountForm
  # define routes for / & /home, this function will be called when these are accessed
 
 @app.route('/')
 @app.route('/home')
 def home():
-    blogData = Posts.query.first()
+    blogData = Posts.query.all()
     return render_template('home.html', title='Home', posts = blogData)
 
 @app.route('/posts', methods=['GET', 'POST'])
@@ -47,7 +47,7 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
-            password=hashed_pw
+            password=hash_pw
         )   
 
         db.session.add(user)
@@ -84,3 +84,34 @@ def about():
 def bantz():
     info = "bants"
     return render_template('bantz.html', title = 'Bantz')
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.email = form.email.data
+        db.session.commit()
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.email.data = current_user.email
+    return render_template('account.html', title='Account', form=form)
+
+
+@app.route("/account/delete", methods=["GET", "POST"])
+@login_required
+def account_delete():
+        user = current_user.id
+        posts = Posts.query.filter_by(user_id=user)
+        for post in posts:
+                db.session.delete(post)
+        account = Users.query.filter_by(id=user).first()
+        logout_user()
+        db.session.delete(account)
+        db.session.commit()
+        return redirect(url_for('register'))
+
